@@ -1,24 +1,24 @@
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws SQLException {
         Gebruiker gebruiker = new Gebruiker(1, "Alexander", "Sprint manager");
-        //gebruiker.stuurBericht();
-        try {
-            String url = "jdbc:mysql://localhost:3306/naamVanDeDatabase";
-            String username = "USERNAME";
-            String password = "PASSWORD";
-            Connection con = DriverManager.getConnection(url, username, password);
-            Statement stmt = con.createStatement();
-            String SQL = ("SELECT * FROM users.berichten");
-            ResultSet rs = stmt.executeQuery(SQL);
-            while(rs.next()) {
-                System.out.println("Dit bericht is verzonden door: " + rs.getString("afzenderID"));
-                System.out.println(rs.getString("text"));
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+        Scrumelement epic1 = new Scrumelement(1, "Epic");
+        ArrayList<Gebruiker> gebruikers = new ArrayList<>();
+        ArrayList<Scrumelement> scrumelementen = new ArrayList<>();
+        scrumelementen.add(epic1);
+        gebruikers.add(gebruiker);
+        System.out.println("Toets 1 om een bericht te sturen, toets 2 om alle berichten te tonen");
+        Scanner sc = new Scanner(System.in);
+        int keuze = sc.nextInt();
+        sc.nextLine();
+        if (keuze == 1) {
+            gebruiker.stuurBericht();
+        } else if (keuze == 2) {
+            String SQL = "SELECT *FROM users.berichten RIGHT JOIN users.scrumelement ON berichten.idscrumelement = scrumelement.idscrumelement ORDER BY datum desc";
+            gebruiker.toonBerichten(SQL, gebruikers);
         }
     }
 }
-
