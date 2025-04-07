@@ -17,7 +17,7 @@ public class Main {
         if (keuze == 1) {
             gebruiker.stuurBericht();
         } else if (keuze == 2) {
-            String SQL = "SELECT *FROM users.berichten RIGHT JOIN users.scrumelement ON berichten.idscrumelement = scrumelement.idscrumelement ORDER BY datum desc";
+            String SQL = "SELECT * FROM scrumassistant.bericht LEFT JOIN scrumassistant.thread ON thread.ThreadID = bericht.Thread_ID LEFT JOIN scrumassistant.taken ON taken.TaakID = bericht.Taak_ID LEFT JOIN scrumassistant.epics ON epics.EpicID = bericht.Epic_ID LEFT JOIN scrumassistant.userstories ON userstories.UserStoryID = bericht.UserStory_ID ORDER BY bericht.datum desc";
             gebruiker.toonBerichten(SQL, gebruikers);
         }
     }

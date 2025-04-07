@@ -3,9 +3,9 @@ import java.util.ArrayList;
 
 public class Database {
     // inloginformatie
-    String url = "jdbc:mysql://localhost:3306/naamVanDatabase";
-    String username = "USERNAME";
-    String password = "PASSWORD";
+    String url = "jdbc:mysql://localhost:3306/scrumassistant";
+    String username = "root";
+    String password = "Tyson1990!";
 
     public String getUrl() {
         return this.url;

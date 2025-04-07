@@ -19,30 +19,69 @@ public class Gebruiker {
     public String getNaam() {return naam;}
     public int getGebruikerID() {return gebruikerID;}
     Database database = new Database();
+
+
+    private String taakBericht(String text, String threadhoren, String datum) {
+        System.out.println("Geef TaakID");
+        int taakID = scanning.nextInt();
+        System.out.println("Geef userstoryID");
+        int userstoryID = scanning.nextInt();
+        System.out.println("Geef epicID");
+        int epicID = scanning.nextInt();
+        if (threadhoren.equals("Y")) {
+            System.out.println("Geef threadID");
+            int threadID = scanning.nextInt();
+            return "INSERT INTO `scrumassistant`.`bericht`(`Tekst`,`Datum`,`AfzenderID`,`Thread_ID`,`Epic_ID`,`UserStory_ID`,`Taak_ID`) VALUES (\""+ text + "\", \"" + datum + "\", " + this.gebruikerID + ", " + threadID + ", " + epicID + ", " + userstoryID + ", " + taakID+ ")";
+        }
+        return "INSERT INTO `scrumassistant`.`bericht`(`Tekst`,`Datum`,`AfzenderID`,`Epic_ID`,`UserStory_ID`,`Taak_ID`) VALUES (\"" + text + "\", \"" + datum + "\", " + this.gebruikerID + ", " + epicID + ", " + userstoryID + ", " + taakID+ ")";
+    }
+    private String userstoryBericht(String text, String threadhoren, String datum) {
+        System.out.println("Geef userstoryID");
+        int userstoryID = scanning.nextInt();
+        System.out.println("Geef epicID");
+        int epicID = scanning.nextInt();
+        if (threadhoren.equals("Y")) {
+            System.out.println("Geef threadID");
+            int threadID = scanning.nextInt();
+            return "INSERT INTO `scrumassistant`.`bericht`(`Tekst`,`Datum`,`AfzenderID`,`Thread_ID`,`Epic_ID`,`UserStory_ID`) VALUES (\""+ text + "\", \"" + datum + "\", " + this.gebruikerID + ", " + threadID + ", " + epicID + ", " + userstoryID +")";
+        }
+        return "INSERT INTO `scrumassistant`.`bericht`(`Tekst`,`Datum`,`AfzenderID`,`Epic_ID`,`UserStory_ID`) VALUES (\"" + text + "\", \"" + datum + "\", " + this.gebruikerID + ", " + epicID + ", " + userstoryID + ")";
+
+    }
+    private String epicBericht(String text, String threadhoren, String datum) {
+        System.out.println("Geef epicID");
+        int epicID = scanning.nextInt();
+        if (threadhoren.equals("Y")) {
+            System.out.println("Geef threadID");
+            int threadID = scanning.nextInt();
+            return "INSERT INTO `scrumassistant`.`bericht`(`Tekst`,`Datum`,`AfzenderID`,`Thread_ID`,`Epic_ID`) VALUES (\""+ text + "\", \"" + datum + "\", " + this.gebruikerID + ", " + threadID + ", " + epicID + ")";
+
+        }
+        return "INSERT INTO `scrumassistant`.`bericht`(`Tekst`,`Datum`,`AfzenderID`,`Epic_ID`) VALUES (\"" + text + "\", \"" + datum + "\", " + this.gebruikerID + ", " + epicID + ")";
+
+    }
+
     public void stuurBericht() throws SQLException {
         //formatten zodat connectie code databse goed gaat
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime currentDateTime = LocalDateTime.now();
         String formatted = currentDateTime.format(formatter);
 
-        System.out.println("Kies uw scrumelement:");
-        int koppelingsID = scanning.nextInt();
-        scanning.nextLine();
+
+        System.out.println("Behoort dit tot een \"Epic\"', \"User Story\" of \"Taak\"?");
+        String scrumelement = scanning.nextLine();
+        System.out.println("Behoort dit bericht tot een thread Y/N?");
+        String threadBehoren = scanning.nextLine();
         System.out.println("Typ uw bericht hier:");
         String text = scanning.nextLine();
-        Scrumelement gekoppeld = null;
-        Database database = new Database();
-        ArrayList<Scrumelement> scrumelementlijst = database.getAllScrumelements();
-        for (Scrumelement scrumelementCheck : scrumelementlijst) {
-            if (scrumelementCheck.getIdscrumelement() == koppelingsID) {
-                gekoppeld = scrumelementCheck;
-                break;
-            }
-        }
-
-        Bericht bericht = new Bericht(text, this.gebruikerID, formatted, gekoppeld);
-        String Query = "INSERT INTO `users`.`berichten` (`text`,`afzenderID`, `datum`, `idscrumelement`) VALUES(\"" + text + "\", \"" + this.gebruikerID + "\", \"" + formatted + "\", \"" + koppelingsID + "\")";
-        database.executeQuery(Query);
+        String query = switch (scrumelement) {
+            case "Taak" -> this.taakBericht(text, threadBehoren, formatted);
+            case "User Story" -> this.userstoryBericht(text, threadBehoren, formatted);
+            case "Epic" -> this.epicBericht(text, threadBehoren, formatted);
+            default -> null;
+        };
+        System.out.println(query);
+        database.executeQuery(query);
 
     }
     public void toonBerichten(String SQL, ArrayList<Gebruiker> gebruikers) {
@@ -56,17 +95,17 @@ public class Gebruiker {
             while(rs.next()) {
                 String verstuurder = null;
                 String datum = rs.getString("datum");
-                String textBericht = rs.getString("text");
-                String typeElement = rs.getString("type");
+                String textBericht = rs.getString("Tekst");
+                String typeElement = rs.getString("Titel");
                 for (Gebruiker gebruikercheck : gebruikers) {
                     if (gebruikercheck.getGebruikerID() == rs.getInt("afzenderID")) {
                         verstuurder = gebruikercheck.getNaam();
                         break;
                     }
                 }
-                System.out.println("Dit bericht behoord tot scrumelement: " + typeElement + " en is verzonden op " + datum);
+                System.out.println("Dit bericht behoord tot scrumelement: " + typeElement + ". En is verzonden op " + datum);
                 System.out.print(verstuurder + ": ");
-                System.out.println(textBericht);
+                System.out.println(textBericht + "\n");
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
