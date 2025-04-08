@@ -17,7 +17,7 @@ public class Main {
         if (keuze == 1) {
             gebruiker.stuurBericht();
         } else if (keuze == 2) {
-            String SQL = "SELECT * FROM scrumassistant.bericht LEFT JOIN scrumassistant.thread ON thread.ThreadID = bericht.Thread_ID LEFT JOIN scrumassistant.taken ON taken.TaakID = bericht.Taak_ID LEFT JOIN scrumassistant.epics ON epics.EpicID = bericht.Epic_ID LEFT JOIN scrumassistant.userstories ON userstories.UserStoryID = bericht.UserStory_ID ORDER BY bericht.datum desc";
+            String SQL = "SELECT b.BerichtID, b.tekst, b.Datum, b.AfzenderID, th.Titel as threadTitel, ta.Titel as taakTitel, us.Titel as userstoryTitel, e.Titel as epicTitel FROM scrumassistant.bericht as b LEFT JOIN scrumassistant.thread as th ON th.ThreadID = b.Thread_ID LEFT JOIN scrumassistant.taken as ta ON ta.TaakID = b.Taak_ID LEFT JOIN scrumassistant.epics as e ON e.EpicID = b.Epic_ID LEFT JOIN scrumassistant.userstories as us ON us.UserStoryID = b.UserStory_ID ORDER BY b.datum desc";
             gebruiker.toonBerichten(SQL, gebruikers);
         }
     }

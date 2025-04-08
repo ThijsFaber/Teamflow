@@ -21,26 +21,27 @@ public class Gebruiker {
     Database database = new Database();
 
 
-    private String taakBericht(String text, String threadhoren, String datum) {
+    private String taakBericht(String text, int threadhoren, String datum) {
+        database.toonAllTaken();
         System.out.println("Geef TaakID");
         int taakID = scanning.nextInt();
         System.out.println("Geef userstoryID");
         int userstoryID = scanning.nextInt();
         System.out.println("Geef epicID");
         int epicID = scanning.nextInt();
-        if (threadhoren.equals("Y")) {
+        if (threadhoren == 1) {
             System.out.println("Geef threadID");
             int threadID = scanning.nextInt();
             return "INSERT INTO `scrumassistant`.`bericht`(`Tekst`,`Datum`,`AfzenderID`,`Thread_ID`,`Epic_ID`,`UserStory_ID`,`Taak_ID`) VALUES (\""+ text + "\", \"" + datum + "\", " + this.gebruikerID + ", " + threadID + ", " + epicID + ", " + userstoryID + ", " + taakID+ ")";
         }
         return "INSERT INTO `scrumassistant`.`bericht`(`Tekst`,`Datum`,`AfzenderID`,`Epic_ID`,`UserStory_ID`,`Taak_ID`) VALUES (\"" + text + "\", \"" + datum + "\", " + this.gebruikerID + ", " + epicID + ", " + userstoryID + ", " + taakID+ ")";
     }
-    private String userstoryBericht(String text, String threadhoren, String datum) {
+    private String userstoryBericht(String text, int threadhoren, String datum) {
         System.out.println("Geef userstoryID");
         int userstoryID = scanning.nextInt();
         System.out.println("Geef epicID");
         int epicID = scanning.nextInt();
-        if (threadhoren.equals("Y")) {
+        if (threadhoren == 1) {
             System.out.println("Geef threadID");
             int threadID = scanning.nextInt();
             return "INSERT INTO `scrumassistant`.`bericht`(`Tekst`,`Datum`,`AfzenderID`,`Thread_ID`,`Epic_ID`,`UserStory_ID`) VALUES (\""+ text + "\", \"" + datum + "\", " + this.gebruikerID + ", " + threadID + ", " + epicID + ", " + userstoryID +")";
@@ -48,10 +49,12 @@ public class Gebruiker {
         return "INSERT INTO `scrumassistant`.`bericht`(`Tekst`,`Datum`,`AfzenderID`,`Epic_ID`,`UserStory_ID`) VALUES (\"" + text + "\", \"" + datum + "\", " + this.gebruikerID + ", " + epicID + ", " + userstoryID + ")";
 
     }
-    private String epicBericht(String text, String threadhoren, String datum) {
+    private String epicBericht(String text, int threadhoren, String datum) {
+        database.toonAllEpics();
+
         System.out.println("Geef epicID");
         int epicID = scanning.nextInt();
-        if (threadhoren.equals("Y")) {
+        if (threadhoren == 1) {
             System.out.println("Geef threadID");
             int threadID = scanning.nextInt();
             return "INSERT INTO `scrumassistant`.`bericht`(`Tekst`,`Datum`,`AfzenderID`,`Thread_ID`,`Epic_ID`) VALUES (\""+ text + "\", \"" + datum + "\", " + this.gebruikerID + ", " + threadID + ", " + epicID + ")";
@@ -70,19 +73,23 @@ public class Gebruiker {
 
         System.out.println("Behoort dit tot een \"Epic\"', \"User Story\" of \"Taak\"?");
         String scrumelement = scanning.nextLine();
-        System.out.println("Behoort dit bericht tot een thread Y/N?");
-        String threadBehoren = scanning.nextLine();
-        System.out.println("Typ uw bericht hier:");
-        String text = scanning.nextLine();
-        String query = switch (scrumelement) {
-            case "Taak" -> this.taakBericht(text, threadBehoren, formatted);
-            case "User Story" -> this.userstoryBericht(text, threadBehoren, formatted);
-            case "Epic" -> this.epicBericht(text, threadBehoren, formatted);
-            default -> null;
-        };
-        System.out.println(query);
-        database.executeQuery(query);
-
+        if (!(scrumelement.equals("Epic") || scrumelement.equals("User Story") || scrumelement.equals("Taak"))) {
+            System.out.println("Er lijkt een typefout te zijn, probeer het opnieuw");
+            this.stuurBericht();
+        } else {
+            System.out.println("Behoort dit bericht tot een thread \n 1. Ja \n 2. Nee");
+            int threadBehoren = scanning.nextInt();
+            scanning.nextLine();
+            System.out.println("Typ uw bericht hier:");
+            String text = scanning.nextLine();
+            String query = switch (scrumelement) {
+                case "Taak" -> this.taakBericht(text, threadBehoren, formatted);
+                case "User Story" -> this.userstoryBericht(text, threadBehoren, formatted);
+                case "Epic" -> this.epicBericht(text, threadBehoren, formatted);
+                default -> null;
+            };
+            //database.executeQuery(query);
+        }
     }
     public void toonBerichten(String SQL, ArrayList<Gebruiker> gebruikers) {
         try {
@@ -96,14 +103,27 @@ public class Gebruiker {
                 String verstuurder = null;
                 String datum = rs.getString("datum");
                 String textBericht = rs.getString("Tekst");
-                String typeElement = rs.getString("Titel");
+                String epicTitel = rs.getString("epicTitel");
+                String userstoryTitel = rs.getString("userstoryTitel");
+                String taakTitel = rs.getString("taakTitel");
+                String threadTitel = rs.getString("threadTitel");
                 for (Gebruiker gebruikercheck : gebruikers) {
                     if (gebruikercheck.getGebruikerID() == rs.getInt("afzenderID")) {
                         verstuurder = gebruikercheck.getNaam();
                         break;
                     }
                 }
-                System.out.println("Dit bericht behoord tot scrumelement: " + typeElement + ". En is verzonden op " + datum);
+                if (!(threadTitel == null)) {
+                    System.out.println("Dit bericht behoord tot thread: " + threadTitel + ". En is verzonden op " + datum);
+                } else if (!(taakTitel == null)) {
+                    System.out.println("Dit bericht behoord tot taak: " + taakTitel + ". En is verzonden op " + datum);
+                } else if (!(userstoryTitel == null)) {
+                    System.out.println("Dit bericht behoord tot user story: " + userstoryTitel + ". En is verzonden op " + datum);
+                } else if (!(epicTitel == null)) {
+                    System.out.println("Dit bericht behoord tot epic: " + epicTitel + ". En is verzonden op " + datum);
+                } else {
+                    System.out.println("Dit bericht behoord tot geen scrumelement en is verzonden op " + datum);
+                }
                 System.out.print(verstuurder + ": ");
                 System.out.println(textBericht + "\n");
             }
