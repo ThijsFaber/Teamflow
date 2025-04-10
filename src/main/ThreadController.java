@@ -107,7 +107,7 @@ public class ThreadController {
         if (t == null) return "Thread niet gevonden.";
         if (!t.getAuteurId().equals(userId)) throw new UnauthorizedException();
 
-        List<Reactie> reacties = ReactieRepository.findByThreadId(threadId);
+        List<Reactie> reacties = ReactieRepository.findByThreadIdSorted(threadId);
         for (Reactie r : reacties) {
             if (r.isPinned()) {
                 r.setPinned(false);
