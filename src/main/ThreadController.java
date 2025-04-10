@@ -14,14 +14,8 @@ public class ThreadController {
             return "Fout: beide velden zijn verplicht.";
         }
 
-        Thread t = new Thread();
-        t.setThreadId(UUID.randomUUID().toString());
-        t.setTitel(titel);
-        t.setHoofdvraag(vraag);
-        t.setAuteurId(auteurId);
-        t.setDatum(LocalDateTime.now());
-        t.setIsClosed(false);
-        t.setIsArchived(false);
+        Thread t = new Thread(UUID.randomUUID().toString(), titel, vraag, auteurId, LocalDateTime.now());
+
 
         try {
             ThreadRepository.save(t);

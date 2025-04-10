@@ -18,6 +18,7 @@ public class Gebruiker {
     }
     public String getNaam() {return naam;}
     public int getGebruikerID() {return gebruikerID;}
+    public String getRol(){return rol;}
     Database database = new Database();
 
 
@@ -138,6 +139,21 @@ public class Gebruiker {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
+        }
+    }
+
+    public void sprintMaken(){
+        System.out.println("Tot wanneer moet deze sprint duren? (met format yyyy-MM-dd uu:mm:ss)");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String eindDatum = scanning.nextLine();
+        try {
+            LocalDateTime eindigenDatum = LocalDateTime.parse(eindDatum, formatter);
+            String SQL = "INSERT INTO `scrumassistant`.`sprint`(`Datum`)VALUES (\""+ eindigenDatum +"\");";
+            database.executeQuery(SQL);
+            System.out.println("Sprint succesvol aangemaakt met eind datum " + eindigenDatum);
+        } catch (Exception e) {
+            System.out.println(e);
+            System.out.println("Ongeldig formaat. Gebruik: yyyy-MM-dd HH:mm");
         }
     }
 }
