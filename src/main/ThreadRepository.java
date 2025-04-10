@@ -1,18 +1,19 @@
 import java.util.HashMap;
 import java.util.Map;
+import com.teamflow.model.ScrumThread;
 
 public class ThreadRepository {
-    private static Map<String, Thread> database = new HashMap<>();
+    private static Map<String, ScrumThread> database = new HashMap<>();
 
-    public static void save(Thread thread) {
+    public static void save(ScrumThread thread) {
         database.put(thread.getThreadId(), thread);
     }
 
-    public static Thread findById(String threadId) {
+    public static ScrumThread findById(String threadId) {
         return database.get(threadId);
     }
 
-    public static void update(Thread thread) {
+    public static void update(ScrumThread thread) {
         database.put(thread.getThreadId(), thread);
     }
 

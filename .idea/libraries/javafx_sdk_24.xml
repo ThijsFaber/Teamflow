@@ -12,6 +12,17 @@
       <root url="jar://$USER_HOME$/Documents/School/InteliJ doc/javafx-sdk-24/lib/jdk.jsobject.jar!/" />
       <root url="jar://$USER_HOME$/Documents/School/InteliJ doc/javafx-sdk-24/lib/jfx.incubator.input.jar!/" />
       <root url="jar://$USER_HOME$/Documents/School/InteliJ doc/javafx-sdk-24/lib/jfx.incubator.richtext.jar!/" />
+      <root url="jar://$PROJECT_DIR$/javafx-sdk-24 copy/lib/javafx-swt.jar!/" />
+      <root url="jar://$PROJECT_DIR$/javafx-sdk-24 copy/lib/javafx.base.jar!/" />
+      <root url="jar://$PROJECT_DIR$/javafx-sdk-24 copy/lib/javafx.controls.jar!/" />
+      <root url="jar://$PROJECT_DIR$/javafx-sdk-24 copy/lib/javafx.fxml.jar!/" />
+      <root url="jar://$PROJECT_DIR$/javafx-sdk-24 copy/lib/javafx.graphics.jar!/" />
+      <root url="jar://$PROJECT_DIR$/javafx-sdk-24 copy/lib/javafx.media.jar!/" />
+      <root url="jar://$PROJECT_DIR$/javafx-sdk-24 copy/lib/javafx.swing.jar!/" />
+      <root url="jar://$PROJECT_DIR$/javafx-sdk-24 copy/lib/javafx.web.jar!/" />
+      <root url="jar://$PROJECT_DIR$/javafx-sdk-24 copy/lib/jdk.jsobject.jar!/" />
+      <root url="jar://$PROJECT_DIR$/javafx-sdk-24 copy/lib/jfx.incubator.input.jar!/" />
+      <root url="jar://$PROJECT_DIR$/javafx-sdk-24 copy/lib/jfx.incubator.richtext.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

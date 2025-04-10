@@ -1,44 +1,23 @@
-import java.util.ArrayList;
+import com.teamflow.model.ScrumThread;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Comparator;
 
 public class ReactieRepository {
+    private static Map<String, ScrumThread> database = new HashMap<>();
 
-    private static Map<String, Reactie> database = new HashMap<>();
-
-    public static void save(Reactie reactie) {
-        database.put(reactie.getReactieId(), reactie);
+    public static void save(ScrumThread thread) {
+        database.put(thread.getThreadId(), thread);
     }
 
-    public static Reactie findById(String reactieId) {
-        return database.get(reactieId);
+    public static ScrumThread findById(String threadId) {
+        return database.get(threadId);
     }
 
-    public static List<Reactie> findByThreadIdSorted(String threadId) {
-        List<Reactie> result = new ArrayList<>();
-        for (Reactie r : database.values()) {
-            if (r.getThreadId().equals(threadId)) {
-                result.add(r);
-            }
-        }
-        result.sort(Comparator.comparing(Reactie::getDatum));
-        return result;
+    public static void update(ScrumThread thread) {
+        database.put(thread.getThreadId(), thread);
     }
 
-    public static Reactie findPinnedByThreadId(String threadId) {
-        for (Reactie r : database.values()) {
-            if (r.getThreadId().equals(threadId) && r.isPinned()) {
-                return r;
-            }
-        }
-        return null;
-    }
-
-    public static void update(Reactie reactie) {
-        database.put(reactie.getReactieId(), reactie);
+    public static void delete(String threadId) {
+        database.remove(threadId);
     }
 }
-
-
