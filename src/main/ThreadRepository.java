@@ -1,6 +1,6 @@
+import com.teamflow.model.ScrumThread;
 import java.util.HashMap;
 import java.util.Map;
-import com.teamflow.model.ScrumThread;
 
 public class ThreadRepository {
     private static Map<String, ScrumThread> database = new HashMap<>();
@@ -21,6 +21,3 @@ public class ThreadRepository {
         database.remove(threadId);
     }
 }
-
-
-
