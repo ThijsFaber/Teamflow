@@ -7,7 +7,8 @@ import javafx.stage.Stage;
 
 public class ThreadAppGUI extends Application {
 
-    private ThreadController controller = new ThreadController();
+    private final ThreadController controller = new ThreadController();
+
 
     @Override
     public void start(Stage stage) {
