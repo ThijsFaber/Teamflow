@@ -1,25 +1,22 @@
-public class Taken {
-    private int taakID;
-    private String titel;
-    private String beschrijving;
-    private int userstoryID;
+public class Taken extends UserStories{
+    protected int taakID;
+    protected String taakTitel;
+    protected String taakBeschrijving;
 
-    public Taken (int taakID, String titel, String beschrijving, int userstoryID) {
+    public Taken (int taakID, String taakTitel, String taakBeschrijving, int userstoryID, String userstorytitel, String userstoryBeschrijving, int epicID, String epicTitel, String epicBeschrijving) {
+        super(userstoryID, userstorytitel, userstoryBeschrijving, epicID, epicTitel, epicBeschrijving);
         this.taakID = taakID;
-        this.titel = titel;
-        this.beschrijving = beschrijving;
-        this.userstoryID = userstoryID;
+        this.taakTitel = taakTitel;
+        this.taakBeschrijving = taakBeschrijving;
     }
-    public int getUserstoryID() {
-        return userstoryID;
-    }
+
     public int getTaakID() {
         return taakID;
     }
-    public String getTitel() {
-        return titel;
+    public String getTaakTitel() {
+        return taakTitel;
     }
-    public String getBeschrijving() {
-        return beschrijving;
+    public String getTaakBeschrijving() {
+        return taakBeschrijving;
     }
 }

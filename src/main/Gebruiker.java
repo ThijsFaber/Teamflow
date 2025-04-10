@@ -11,7 +11,7 @@ public class Gebruiker {
     private String naam;
     private String rol;
 
-    public Gebruiker(int gebruikerID, String naam, String rol) throws SQLException {
+    public Gebruiker(int gebruikerID, String naam, String rol) {
         this.gebruikerID = gebruikerID;
         this.naam = naam;
         this.rol = rol;
@@ -22,13 +22,17 @@ public class Gebruiker {
 
 
     private String taakBericht(String text, int threadhoren, String datum) {
-        database.toonAllTaken();
+        ArrayList<Taken> takens = database.toonAllTaken();
         System.out.println("Geef TaakID");
         int taakID = scanning.nextInt();
-        System.out.println("Geef userstoryID");
-        int userstoryID = scanning.nextInt();
-        System.out.println("Geef epicID");
-        int epicID = scanning.nextInt();
+        int userstoryID = 0;
+        int epicID = 0;
+        for (Taken taak : takens) {
+            if (taak.getTaakID() == taakID) {
+                userstoryID = taak.getUserstoryID();
+                epicID = taak.getEpicID();
+            }
+        }
         if (threadhoren == 1) {
             System.out.println("Geef threadID");
             int threadID = scanning.nextInt();
@@ -37,10 +41,15 @@ public class Gebruiker {
         return "INSERT INTO `scrumassistant`.`bericht`(`Tekst`,`Datum`,`AfzenderID`,`Epic_ID`,`UserStory_ID`,`Taak_ID`) VALUES (\"" + text + "\", \"" + datum + "\", " + this.gebruikerID + ", " + epicID + ", " + userstoryID + ", " + taakID+ ")";
     }
     private String userstoryBericht(String text, int threadhoren, String datum) {
+        ArrayList<UserStories> userStories = database.toonAllUserStorys();
         System.out.println("Geef userstoryID");
         int userstoryID = scanning.nextInt();
-        System.out.println("Geef epicID");
-        int epicID = scanning.nextInt();
+        int epicID = 0;
+        for (UserStories userStory : userStories) {
+            if (userStory.getUserstoryID() == userstoryID) {
+                epicID = userStory.getEpicID();
+            }
+        }
         if (threadhoren == 1) {
             System.out.println("Geef threadID");
             int threadID = scanning.nextInt();
@@ -50,7 +59,7 @@ public class Gebruiker {
 
     }
     private String epicBericht(String text, int threadhoren, String datum) {
-        database.toonAllEpics();
+        ArrayList<Epics> epics = database.toonAllEpics();
 
         System.out.println("Geef epicID");
         int epicID = scanning.nextInt();
@@ -71,7 +80,7 @@ public class Gebruiker {
         String formatted = currentDateTime.format(formatter);
 
 
-        System.out.println("Behoort dit tot een \"Epic\"', \"User Story\" of \"Taak\"?");
+        System.out.println("Behoort dit tot een \"Epic\", \"User Story\" of \"Taak\"?");
         String scrumelement = scanning.nextLine();
         if (!(scrumelement.equals("Epic") || scrumelement.equals("User Story") || scrumelement.equals("Taak"))) {
             System.out.println("Er lijkt een typefout te zijn, probeer het opnieuw");
@@ -88,7 +97,7 @@ public class Gebruiker {
                 case "Epic" -> this.epicBericht(text, threadBehoren, formatted);
                 default -> null;
             };
-            //database.executeQuery(query);
+            database.executeQuery(query);
         }
     }
     public void toonBerichten(String SQL, ArrayList<Gebruiker> gebruikers) {
