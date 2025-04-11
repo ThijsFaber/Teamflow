@@ -68,5 +68,5 @@ public class ThreadController {
         return "Thread succesvol verwijderd.";
     }
 
-    // (plaatsReactie, getReactiesVoorThread, pinReactie, unpinReactie kun je zelf later ook updaten op basis van ScrumThread)
+    // (plaatsReactie, getReactiesVoorThread, pinReactie, unpinReactie kun je zelf later ook updaten op basis van ScrumThread.java)
 }
