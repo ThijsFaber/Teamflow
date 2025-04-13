@@ -1,0 +1,44 @@
+import java.sql.Date;
+
+public class Thread { //hier de attributen-> check de database
+    private int threadID;
+    private String titel;
+    private String inhoud;
+    private int auteurID;
+    private Date datum; //wanneer is de thread aangemaakt
+
+    private boolean status; //is thread actief?
+    private int scrumElementID; // koppeling ->foreign key
+    private boolean isClosed; // is het gesloten (voor reactie)?
+    private boolean isArchived; //is het verborgen?
+
+
+
+    //Constructor voor thtread
+    public Thread(int threadID, String titel, String inhoud, boolean status, int scrumElementID, int auteurID, Date datum, boolean isClosed, boolean isArchived) {
+        this.threadID = threadID;
+        this.titel = titel;
+        this.inhoud = inhoud;
+        this.status = status;
+        this.scrumElementID = scrumElementID;
+        this.auteurID = auteurID;
+        this.datum = datum;
+        this.isClosed = isClosed;
+        this.isArchived = isArchived;
+    }
+
+
+
+    //getters om waarden op te vragen
+    public int getThreadID() { return threadID; }
+    public String getTitel() { return titel; }
+    public String getInhoud() { return inhoud; }
+    public boolean isStatus() { return status; }
+    public int getScrumElementID() { return scrumElementID; }
+    public int getAuteurID() { return auteurID; }
+    public Date getDatum() { return datum; }
+    public boolean isClosed() { return isClosed; }
+    public boolean isArchived() { return isArchived; }
+}
+
+
