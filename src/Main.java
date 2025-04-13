@@ -218,6 +218,7 @@ public class Main {
                                 // extra opties voor scrummaster
                                 System.out.println("2. Voeg nieuwe sprint toe");
                                 System.out.println("3. Voeg Scrum Elementen toe");
+                                System.out.println("4. Voeg een gebruiker aan de sprint toe");
                             }
 
                             System.out.println("0. Terug");
@@ -271,6 +272,20 @@ public class Main {
                                         System.out.println("Ongeldige keuze.");
                                     }
                                 }
+
+                            } else if (opt == 4 && gebruiker.getRol().equalsIgnoreCase("scrummaster")){
+                                // sprints tonen om uit te kiezen
+                                System.out.println("Alle sprints tonen...");
+                                System.out.println("Actieve sprints:");
+                                List<Sprint> activeSprints = sprintService.getActiveSprints();
+                                for (Sprint sprint : activeSprints) {
+                                    System.out.println(sprint.getSprintID() + ". " + sprint.getNaam());
+                                }
+                                System.out.println("SprintID (Sprint om aan toe te voegen)");
+                                int sprintID = Integer.parseInt(scanner.nextLine());
+                                System.out.println("Geef gebruikersID");
+                                int gebruikersID = Integer.parseInt(scanner.nextLine());
+                                sprintService.userAddSprint(sprintID, gebruikersID);
 
                             } else if (opt == 0) {
                                 break;
