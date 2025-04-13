@@ -11,7 +11,7 @@ public class loginUser {
             if (rs.next()) {
                 return rs.getString("Rol");
             } else {
-                return null; // geen match
+                return null;
             }
         }
     }

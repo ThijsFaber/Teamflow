@@ -75,7 +75,8 @@ public class Gebruiker {
     }
 
     public void stuurBericht() throws SQLException {
-        //formatten zodat connectie code databse goed gaat
+
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime currentDateTime = LocalDateTime.now();
         String formatted = currentDateTime.format(formatter);
