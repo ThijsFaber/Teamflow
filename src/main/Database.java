@@ -2,7 +2,7 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class Database {
-    // inloginformatie
+
     String url = "jdbc:mysql://localhost:3306/scrumassistant";
     String username = "root";
     String password = "Tyson1990!";
@@ -16,23 +16,25 @@ public class Database {
     public String getPassword() {
         return this.password;
     }
-    public void executeQuery(String Query) throws  SQLException { // methode om een query zonder resultaat uit te voeren
+    public void executeQuery(String Query) throws  SQLException {
         Statement stmt = null;
-        // connecten tot de database
+
+
         try {
             Connection con = DriverManager.getConnection(url, username, password);
             stmt = con.createStatement();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-        // de query uitvoeren
+        /
         stmt.execute(Query);
     }
 
     public ArrayList<Epics> toonAllEpics() {
         Statement stmt;
         ArrayList <Epics> epics = new ArrayList<>();
-        // connecten tot de database
+
+
         try {
             Connection con = DriverManager.getConnection(url, username, password);
             stmt = con.createStatement();
@@ -57,7 +59,8 @@ public class Database {
     public ArrayList<UserStories> toonAllUserStorys() {
         Statement stmt;
         ArrayList <UserStories> userstorys = new ArrayList<>();
-        // connecten tot de database
+
+
         try {
             Connection con = DriverManager.getConnection(url, username, password);
             stmt = con.createStatement();
@@ -87,7 +90,8 @@ public class Database {
     public ArrayList<Taken> toonAllTaken() {
         Statement stmt;
         ArrayList <Taken> takens = new ArrayList<>();
-        // connecten tot de database
+
+
         try {
             Connection con = DriverManager.getConnection(url, username, password);
             stmt = con.createStatement();
