@@ -1,4 +1,7 @@
+import java.sql.Connection;
 import java.sql.Date;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
@@ -34,9 +37,24 @@ public class Sprint {
     public long getDaysLeft() {
         LocalDate startDate = datum.toLocalDate();
         LocalDate endDate = startDate.plusWeeks(2);  // Sprint lasts 2 weeks
+        if (ChronoUnit.DAYS.between(LocalDate.now(), endDate) <= 0) {
+            this.status = false;
+            try {
+                sprintSluiten();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
         return ChronoUnit.DAYS.between(LocalDate.now(), endDate);
     }
 
+    private void sprintSluiten() throws SQLException {
+        String sql = "UPDATE `scrumassistant`.`sprint` SET `Status` = 0 WHERE `SprintID` = " + this.sprintID;
+        try (Connection conn = Account.connect()) {
+            Statement stmt = conn.createStatement();
+            stmt.executeUpdate(sql);
+        }
+    }
     @Override
     public String toString() {
         return "Sprint #" + sprintID + " | Naam: " + naam + " | Datum: " + datum + " | Actief: " + (status ? "Ja" : "Nee") + " | Tijd over: " + getDaysLeft() + " dagen";
