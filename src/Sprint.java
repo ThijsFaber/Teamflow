@@ -40,7 +40,7 @@ public class Sprint {
         if (ChronoUnit.DAYS.between(LocalDate.now(), endDate) <= 0) {
             this.status = false;
             try {
-                sprintSluiten();
+                sprintSluiten(this.sprintID);
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -48,8 +48,8 @@ public class Sprint {
         return ChronoUnit.DAYS.between(LocalDate.now(), endDate);
     }
 
-    private void sprintSluiten() throws SQLException {
-        String sql = "UPDATE `scrumassistant`.`sprint` SET `Status` = 0 WHERE `SprintID` = " + this.sprintID;
+    public static void sprintSluiten(int sprintID) throws SQLException {
+        String sql = "UPDATE `scrumassistant`.`sprint` SET `Status` = 0 WHERE `SprintID` = " + sprintID;
         try (Connection conn = Account.connect()) {
             Statement stmt = conn.createStatement();
             stmt.executeUpdate(sql);

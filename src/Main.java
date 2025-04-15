@@ -184,7 +184,14 @@ public class Main {
             }
         }
     }
-
+    public static void alleSprintsTonen() throws SQLException {
+        System.out.println("Alle sprints tonen:");
+        SprintService sprintService = new SprintService();
+        List<Sprint> activeSprints = sprintService.getActiveSprints();
+        for (Sprint sprint : activeSprints) {
+            System.out.println(sprint.getSprintID() + ". " + sprint.getNaam());
+        }
+    }
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         Authenticator auth = new Authenticator(); // login/register handler
@@ -223,9 +230,10 @@ public class Main {
                             if (gebruiker.getRol().equalsIgnoreCase("scrummaster")) {
                                 // extra opties voor scrummaster
                                 System.out.println("2. Voeg nieuwe sprint toe");
-                                System.out.println("3. Voeg Scrum Elementen toe");
-                                System.out.println("4. Voeg een gebruiker aan de sprint toe");
-                                System.out.println("5. Verwijder een gebruiker van de sprint");
+                                System.out.println("3. Sprint verwijderen");
+                                System.out.println("4. Voeg Scrum Elementen toe");
+                                System.out.println("5. Voeg een gebruiker aan de sprint toe");
+                                System.out.println("6. Verwijder een gebruiker van de sprint");
                             }
 
                             System.out.println("0. Terug");
@@ -242,6 +250,13 @@ public class Main {
                                 System.out.println("Nieuwe sprint toegevoegd.");
 
                             } else if (opt == 3 && gebruiker.getRol().equalsIgnoreCase("scrummaster")) {
+                                //sprints verwijderen
+                                alleSprintsTonen();
+                                System.out.println("Geef sprintID om te verwijderen");
+                                int sprintID = Integer.parseInt(scanner.nextLine());
+                                Sprint.sprintSluiten(sprintID);
+                                System.out.println("Sprint succesvol verwijderd\n");
+                            }else if (opt == 4 && gebruiker.getRol().equalsIgnoreCase("scrummaster")) {
                                 // scrum elementen toevoegen
                                 while (true) {
                                     System.out.println("\n4. Voeg Scrum Elementen toe");
@@ -280,24 +295,16 @@ public class Main {
                                     }
                                 }
 
-                            } else if (opt == 4 && gebruiker.getRol().equalsIgnoreCase("scrummaster")){
-                                System.out.println("Alle sprints tonen:");
-                                List<Sprint> activeSprints = sprintService.getActiveSprints();
-                                for (Sprint sprint : activeSprints) {
-                                    System.out.println(sprint.getSprintID() + ". " + sprint.getNaam());
-                                }
+                            } else if (opt == 5 && gebruiker.getRol().equalsIgnoreCase("scrummaster")){
+                                alleSprintsTonen();
                                 System.out.println("SprintID (Sprint om aan toe te voegen)");
                                 int sprintID = Integer.parseInt(scanner.nextLine());
                                 System.out.println("Geef gebruikersID");
                                 int gebruikersID = Integer.parseInt(scanner.nextLine());
                                 sprintService.userAddSprint(sprintID, gebruikersID);
 
-                            } else if (opt == 5 && gebruiker.getRol().equalsIgnoreCase("scrummaster")) {
-                                System.out.println("Alle sprints tonen:");
-                                List<Sprint> activeSprints = sprintService.getActiveSprints();
-                                for (Sprint sprint : activeSprints) {
-                                    System.out.println(sprint.getSprintID() + ". " + sprint.getNaam());
-                                }
+                            } else if (opt == 6 && gebruiker.getRol().equalsIgnoreCase("scrummaster")) {
+                                alleSprintsTonen();
                                 System.out.println("SprintID (Sprint om aan toe te voegen)");
                                 int sprintID = Integer.parseInt(scanner.nextLine());
                                 System.out.println("1. Enkele gebruiker verwijderen");
