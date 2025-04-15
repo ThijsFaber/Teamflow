@@ -100,7 +100,25 @@ public class SprintService {
             stmt.setInt(1, SprintID);
             stmt.setInt(2, gebruikersID);
             stmt.executeUpdate();
-            System.out.print("Gebruiker toegevoegd aan sprint");
+            System.out.print("Gebruiker toegevoegd aan sprint\n");
+        }
+    }
+    public void userDeleteSprint(int SprintID, int gebruikersID) throws SQLException {
+        String sql = "DELETE FROM sprint_teamleden WHERE GebruikerID = ? AND SprintID = ?";
+        try (Connection conn = Account.connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, gebruikersID);
+            stmt.setInt(2, SprintID);
+            stmt.executeUpdate();
+            System.out.print("Gebruiker verwijderd van sprint\n");
+        }
+    }
+
+    public void userDeleteAllSprint(int SprintID) throws SQLException {
+        String sql = "DELETE FROM sprint_teamleden WHERE SprintID = ?";
+        try (Connection conn = Account.connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, SprintID);
+            stmt.executeUpdate();
+            System.out.print("Iedereen verwijdered van de sprint\n");
         }
     }
 }
