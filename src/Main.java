@@ -9,7 +9,13 @@ public class Main {
 
     // deze methode laat je actieve sprints zien en daarna kan je berichten bekijken/sturen
     private static void viewActiveSprints(SprintService sprintService, MessageService messageService, Gebruiker gebruiker, Scanner scanner) throws SQLException {
-        List<Sprint> activeSprints = sprintService.getActiveSprints();
+        List<Sprint> activeSprints;
+        //voor scrummasters alle sprints laten zien en voor gebruikers alleen met toegang
+        if (gebruiker.getRol().equalsIgnoreCase("scrummaster")) {
+            activeSprints = sprintService.getActiveSprints();
+        } else {
+            activeSprints = sprintService.getActiveSprintsForUser(gebruiker);
+        }
 
         if (activeSprints.isEmpty()) {
             System.out.println("Er zijn momenteel geen actieve sprints."); // lege sprints

@@ -13,7 +13,7 @@ public class SprintService {
                 "FROM sprint AS sp " +
                     "JOIN sprint_teamleden AS spt on sp.SprintID = spt.SprintID " +
                     "JOIN gebruiker AS g on spt.GebruikerID = g.GebruikerID " +
-                "WHERE Status = 1 AND spt.GebruikerID = " + gebruiker.getGebruikerID();// Active sprints only
+                "WHERE Status = 1 AND spt.GebruikerID = " + gebruiker.getGebruikerID();// Active sprints only for the connected user
         try (Connection conn = Account.connect(); Statement stmt = conn.createStatement()) {
             ResultSet rs = stmt.executeQuery(sql);
 
