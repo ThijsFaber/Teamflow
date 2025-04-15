@@ -8,11 +8,19 @@ public class Authenticator {
     public void register(String naam, String rol) throws SQLException {
         String query = "INSERT INTO Gebruiker (Naam, Rol) VALUES (?, ?)";
         try (Connection conn = Account.connect();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
+             PreparedStatement stmt = conn.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, naam);
             stmt.setString(2, rol);
             stmt.executeUpdate();
+
+            ResultSet generatedKeys = stmt.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                int gebruikerID = generatedKeys.getInt(1);
+                System.out.println("Je gebruikersID is: " + gebruikerID);
+            }
+
         }
+
     }
 
     public Gebruiker login(String naam, int gebruikerID) throws SQLException {
