@@ -6,9 +6,31 @@ import java.util.List;
 public class SprintService {
 
     // Retrieve active sprints
+    public List<Sprint> getActiveSprintsForUser(Gebruiker gebruiker) throws SQLException {
+        List<Sprint> sprints = new ArrayList<>();
+        String sql =
+                "SELECT * " +
+                "FROM sprint AS sp " +
+                    "JOIN sprint_teamleden AS spt on sp.SprintID = spt.SprintID " +
+                    "JOIN gebruiker AS g on spt.GebruikerID = g.GebruikerID " +
+                "WHERE Status = 1 AND spt.GebruikerID = " + gebruiker.getGebruikerID();// Active sprints only
+        try (Connection conn = Account.connect(); Statement stmt = conn.createStatement()) {
+            ResultSet rs = stmt.executeQuery(sql);
+
+            while (rs.next()) {
+                int sprintID = rs.getInt("SprintID");
+                String naam = rs.getString("Naam");
+                boolean status = rs.getBoolean("Status");
+                Date datum = rs.getDate("Datum");
+                sprints.add(new Sprint(sprintID, naam, status, datum));
+            }
+        }
+        return sprints;
+    }
+
     public List<Sprint> getActiveSprints() throws SQLException {
         List<Sprint> sprints = new ArrayList<>();
-        String sql = "SELECT * FROM Sprint WHERE Status = 1"; // Active sprints only
+        String sql = "SELECT * FROM sprint WHERE Status = 1"; // Active sprints only
         try (Connection conn = Account.connect(); Statement stmt = conn.createStatement()) {
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
