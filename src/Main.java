@@ -9,12 +9,8 @@ public class Main {
 
     // deze methode laat je actieve sprints zien en daarna kan je berichten bekijken/sturen
     private static void viewActiveSprints(SprintService sprintService, MessageService messageService, Gebruiker gebruiker, Scanner scanner) throws SQLException {
-        List<Sprint> activeSprints = null;
-        if (gebruiker.getRol().equalsIgnoreCase("scrummaster")){
-            activeSprints = sprintService.getActiveSprints();
-        } else {
-            activeSprints = sprintService.getActiveSprintsForUser(gebruiker);
-        }
+        List<Sprint> activeSprints = sprintService.getActiveSprints();
+
         if (activeSprints.isEmpty()) {
             System.out.println("Er zijn momenteel geen actieve sprints."); // lege sprints
             return;
@@ -39,7 +35,7 @@ public class Main {
 
         if (selectedSprint != null) {
             System.out.println("Je hebt de sprint '" + selectedSprint.getNaam() + "' gekozen.");
-            messageService.displayMessages(sprintID);  // hier laat je alle berichten zien die bij deze sprint horen
+            messageService.displayMessagesForSprint(sprintID);  // hier laat je alle berichten zien die bij deze sprint horen
             sendMessageInSprint(selectedSprint, gebruiker, messageService, scanner); // doorsturen naar volgende class
         } else {
             System.out.println("Ongeldige SprintID. Probeer opnieuw.");

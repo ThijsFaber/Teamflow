@@ -3,31 +3,18 @@ import java.time.LocalDate;
 public class MessageService {
 
     // Methode om berichten weer te geven voor een specifieke sprint
-    public void displayMessages(int sprintID) {
-        // SQL-query om berichten op te halen op basis van SprintID in plaats van ThreadID
-        String query = "SELECT b.Tekst, b.Datum, g.Naam, g.Rol, e.Titel AS EpicTitel, e.Beschrijving AS EpicBeschrijving, " +
-                "us.Titel AS UserStoryTitel, us.Beschrijving AS UserStoryBeschrijving, t.Titel AS TaakTitel, t.Beschrijving AS TaakBeschrijving " +
-                "FROM Bericht b " +
-                "JOIN Gebruiker g ON b.AfzenderID = g.GebruikerID " +
-                "LEFT JOIN Epics e ON b.Epic_ID = e.EpicID " +
-                "LEFT JOIN UserStories us ON b.UserStory_ID = us.UserStoryID " +
-                "LEFT JOIN Taken t ON b.Taak_ID = t.TaakID " +
-                "JOIN Sprint_Bericht_Verbinding sbv ON b.BerichtID = sbv.BerichtID " +
-                "WHERE sbv.SprintID = ?";
-
+    private void displayMessages(String query, int id) {
         try (Connection connection = Account.connect();
              PreparedStatement stmt = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
 
-            stmt.setInt(1, sprintID);
+            stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
 
-            // Als er geen berichten zijn, geef dan een melding
             if (!rs.next()) {
-                System.out.println("Geen berichten gevonden voor SprintID: " + sprintID);
+                System.out.println("Geen berichten gevonden voor ID: " + id);
                 return;
             }
 
-            // Zet de cursor terug naar de eerste rij
             rs.beforeFirst();
 
             while (rs.next()) {
@@ -41,9 +28,9 @@ public class MessageService {
                 String taakBeschrijving = rs.getString("TaakBeschrijving");
                 String tekst = rs.getString("Tekst");
                 Date datum = rs.getDate("Datum");
+
                 System.out.println("Naam: " + naam);
                 System.out.println("Rol: " + rol);
-                // Toon Scrum elementen als ze bestaan
                 if (epicTitel != null || userStoryTitel != null || taakTitel != null) {
                     if (epicTitel != null) {
                         System.out.println("Epic titel: " + epicTitel);
@@ -66,6 +53,7 @@ public class MessageService {
             System.err.println("Fout bij het ophalen van berichten: " + e.getMessage());
         }
     }
+
 
     // Methode om een bericht te versturen voor een specifieke sprint en optioneel te koppelen aan Scrum-elementen
     public void sendMessage(int gebruikerID, int sprintID, String tekst, int epicID, int userStoryID, int taakID) {
@@ -127,23 +115,33 @@ public class MessageService {
         }
     }
 
-    // Methode om berichten weer te geven in een specifieke thread
-    public void displayMessagesInThread(int threadID) throws SQLException {
-        String sql = "SELECT * FROM Bericht WHERE Thread_ID = ?";
-        try (Connection conn = Account.connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, threadID);
-            ResultSet rs = stmt.executeQuery();
-
-            System.out.println("\nBerichten in deze thread:");
-            while (rs.next()) {
-                String tekst = rs.getString("Tekst");
-                Date datum = rs.getDate("Datum");
-                int afzenderID = rs.getInt("AfzenderID");
-
-                System.out.println("[" + datum + "] (Gebruiker " + afzenderID + "): " + tekst);
-            }
-        }
+    public void displayMessagesForSprint(int sprintID) {
+        String query = "SELECT b.Tekst, b.Datum, g.Naam, g.Rol, e.Titel AS EpicTitel, e.Beschrijving AS EpicBeschrijving, " +
+                "us.Titel AS UserStoryTitel, us.Beschrijving AS UserStoryBeschrijving, t.Titel AS TaakTitel, t.Beschrijving AS TaakBeschrijving " +
+                "FROM Bericht b " +
+                "JOIN Gebruiker g ON b.AfzenderID = g.GebruikerID " +
+                "LEFT JOIN Epics e ON b.Epic_ID = e.EpicID " +
+                "LEFT JOIN UserStories us ON b.UserStory_ID = us.UserStoryID " +
+                "LEFT JOIN Taken t ON b.Taak_ID = t.TaakID " +
+                "JOIN Sprint_Bericht_Verbinding sbv ON b.BerichtID = sbv.BerichtID " +
+                "WHERE sbv.SprintID = ?";
+        displayMessages(query, sprintID);
     }
+
+
+    // Methode om berichten weer te geven in een specifieke thread
+    public void displayMessagesInThread(int threadID) {
+        String query = "SELECT b.Tekst, b.Datum, g.Naam, g.Rol, e.Titel AS EpicTitel, e.Beschrijving AS EpicBeschrijving, " +
+                "us.Titel AS UserStoryTitel, us.Beschrijving AS UserStoryBeschrijving, t.Titel AS TaakTitel, t.Beschrijving AS TaakBeschrijving " +
+                "FROM Bericht b " +
+                "JOIN Gebruiker g ON b.AfzenderID = g.GebruikerID " +
+                "LEFT JOIN Epics e ON b.Epic_ID = e.EpicID " +
+                "LEFT JOIN UserStories us ON b.UserStory_ID = us.UserStoryID " +
+                "LEFT JOIN Taken t ON b.Taak_ID = t.TaakID " +
+                "WHERE b.Thread_ID = ?";
+        displayMessages(query, threadID);
+    }
+
 
     // Methode om een bericht naar een thread te sturen
     public void sendMessageToThread(int gebruikerID, int threadID, String tekst, int epicID, int userStoryID, int taakID) throws SQLException {
