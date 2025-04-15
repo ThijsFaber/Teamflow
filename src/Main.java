@@ -1,6 +1,7 @@
 // alle imports die we nodig hebben voor SQL stuff en input van gebruiker
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 import java.sql.Date;
 import java.time.LocalDate;
@@ -106,39 +107,82 @@ public class Main {
                             System.out.print("Wil je een thread openen om berichten te bekijken of te reageren? (Voer ThreadID in of 0 om terug te gaan): ");
                             int chosenThreadID = Integer.parseInt(scanner.nextLine());
 
+                            Thread gekozenThread = null;
+                            for (Thread t : threads) {
+                                if (t.getID() == chosenThreadID) {
+                                    gekozenThread = t;
+                                    break;
+                                }
+                            }
+
                             if (chosenThreadID > 0) {
                                 messageService.displayMessagesInThread(chosenThreadID); // laat alle berichten in thread zien
 
-                                System.out.print("Wil je reageren op deze thread? (ja/nee): ");
-                                String reply = scanner.nextLine();
+                                boolean inThreadMenu = true;
+                                while (inThreadMenu) {
+                                    System.out.println("\nKies een optie:");
+                                    System.out.println("1. Bericht sturen");
 
-                                if (reply.equalsIgnoreCase("ja")) {
-                                    System.out.print("Typ je bericht: ");
-                                    tekst = scanner.nextLine();
-
-                                    // koppeling resetten
-                                    epicID = 0;
-                                    userStoryID = 0;
-                                    taakID = 0;
-
-                                    System.out.print("Koppel een Epic, UserStory of Taak? (Epic/UserStory/Taak/Nee): ");
-                                    String koppeling = scanner.nextLine();
-
-                                    // weer koppelen als dat moet
-                                    if (koppeling.equalsIgnoreCase("Epic")) {
-                                        System.out.print("Epic ID: ");
-                                        epicID = Integer.parseInt(scanner.nextLine());
-                                    } else if (koppeling.equalsIgnoreCase("UserStory")) {
-                                        System.out.print("UserStory ID: ");
-                                        userStoryID = Integer.parseInt(scanner.nextLine());
-                                    } else if (koppeling.equalsIgnoreCase("Taak")) {
-                                        System.out.print("Taak ID: ");
-                                        taakID = Integer.parseInt(scanner.nextLine());
+                                    // Check if the current user is the scrummaster or the maker of the thread
+                                    if (gekozenThread != null && (gebruiker.getRol().equalsIgnoreCase("scrummaster") || gebruiker.getGebruikerID() == (gekozenThread).getMakerID())) {
+                                        System.out.println("2. Juiste antwoord kiezen (nog niet beschikbaar)");
+                                        System.out.println("3. Thread sluiten (nog niet beschikbaar)");
                                     }
 
-                                    messageService.sendMessageToThread(gebruiker.getGebruikerID(), chosenThreadID, tekst, epicID, userStoryID, taakID);
+                                    System.out.println("0. Terug");
+
+                                    String keuze = scanner.nextLine();
+
+                                    switch (keuze) {
+                                        case "1":
+                                            System.out.print("Typ je bericht: ");
+                                            tekst = scanner.nextLine();
+
+                                            // koppeling resetten
+                                            epicID = 0;
+                                            userStoryID = 0;
+                                            taakID = 0;
+
+                                            System.out.print("Koppel een Epic, UserStory of Taak? (Epic/UserStory/Taak/Nee): ");
+                                            String koppeling = scanner.nextLine();
+
+                                            if (koppeling.equalsIgnoreCase("Epic")) {
+                                                System.out.print("Epic ID: ");
+                                                epicID = Integer.parseInt(scanner.nextLine());
+                                            } else if (koppeling.equalsIgnoreCase("UserStory")) {
+                                                System.out.print("UserStory ID: ");
+                                                userStoryID = Integer.parseInt(scanner.nextLine());
+                                            } else if (koppeling.equalsIgnoreCase("Taak")) {
+                                                System.out.print("Taak ID: ");
+                                                taakID = Integer.parseInt(scanner.nextLine());
+                                            }
+
+                                            messageService.sendMessageToThread(gebruiker.getGebruikerID(), chosenThreadID, tekst, epicID, userStoryID, taakID);
+                                            break;
+
+                                        case "2":
+                                            if (gekozenThread != null && (gebruiker.getRol().equalsIgnoreCase("scrummaster") || gebruiker.getGebruikerID() == gekozenThread.getMakerID())) {
+                                                System.out.println("Functie 'juiste antwoord kiezen' is nog niet beschikbaar.");
+                                            }
+                                            break;
+
+                                        case "3":
+                                            if (gekozenThread != null && (gebruiker.getRol().equalsIgnoreCase("scrummaster") || gebruiker.getGebruikerID() == gekozenThread.getMakerID())) {
+                                                System.out.println("Functie 'thread sluiten' is nog niet beschikbaar.");
+                                            }
+                                            break;
+
+                                        case "0":
+                                            inThreadMenu = false;
+                                            break;
+
+                                        default:
+                                            System.out.println("Ongeldige keuze, probeer opnieuw.");
+                                    }
                                 }
+
                             }
+
                         }
                     } catch (SQLException e) {
                         System.err.println("Fout bij het ophalen van threads: " + e.getMessage());
@@ -169,7 +213,7 @@ public class Main {
                     }
 
                     try {
-                        threadService.createThread(titel, sprint.getSprintID(), epicID, userStoryID, taakID);
+                        threadService.createThread(titel, sprint.getSprintID(), epicID, userStoryID, taakID, gebruiker.getGebruikerID());
                     } catch (SQLException e) {
                         System.err.println("Fout bij het aanmaken van de thread: " + e.getMessage());
                     }

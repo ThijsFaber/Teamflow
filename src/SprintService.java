@@ -10,10 +10,10 @@ public class SprintService {
         List<Sprint> sprints = new ArrayList<>();
         String sql =
                 "SELECT * " +
-                "FROM sprint AS sp " +
-                    "JOIN sprint_teamleden AS spt on sp.SprintID = spt.SprintID " +
-                    "JOIN gebruiker AS g on spt.GebruikerID = g.GebruikerID " +
-                "WHERE Status = 1 AND spt.GebruikerID = " + gebruiker.getGebruikerID();// Active sprints only for the connected user
+                        "FROM sprint AS sp " +
+                        "JOIN sprint_teamleden AS spt on sp.SprintID = spt.SprintID " +
+                        "JOIN gebruiker AS g on spt.GebruikerID = g.GebruikerID " +
+                        "WHERE Status = 1 AND spt.GebruikerID = " + gebruiker.getGebruikerID();// Active sprints only
         try (Connection conn = Account.connect(); Statement stmt = conn.createStatement()) {
             ResultSet rs = stmt.executeQuery(sql);
 
@@ -100,7 +100,7 @@ public class SprintService {
             stmt.setInt(1, SprintID);
             stmt.setInt(2, gebruikersID);
             stmt.executeUpdate();
-            System.out.print("Gebruiker toegevoegd aan sprint\n");
+            System.out.print("Gebruiker toegevoegd aan sprint");
         }
     }
     public void userDeleteSprint(int SprintID, int gebruikersID) throws SQLException {
@@ -122,4 +122,3 @@ public class SprintService {
         }
     }
 }
-

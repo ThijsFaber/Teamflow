@@ -3,54 +3,77 @@ import java.time.LocalDate;
 public class MessageService {
 
     // Methode om berichten weer te geven voor een specifieke sprint
+    // Voor queries met één parameter
     private void displayMessages(String query, int id) {
         try (Connection connection = Account.connect();
              PreparedStatement stmt = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
 
             stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
 
-            if (!rs.next()) {
-                System.out.println("Geen berichten gevonden voor ID: " + id);
-                return;
-            }
+            processMessageResultSet(stmt.executeQuery(), id);
 
-            rs.beforeFirst();
-
-            while (rs.next()) {
-                String naam = rs.getString("Naam");
-                String rol = rs.getString("Rol");
-                String epicTitel = rs.getString("EpicTitel");
-                String epicBeschrijving = rs.getString("EpicBeschrijving");
-                String userStoryTitel = rs.getString("UserStoryTitel");
-                String userStoryBeschrijving = rs.getString("UserStoryBeschrijving");
-                String taakTitel = rs.getString("TaakTitel");
-                String taakBeschrijving = rs.getString("TaakBeschrijving");
-                String tekst = rs.getString("Tekst");
-                Date datum = rs.getDate("Datum");
-
-                System.out.println("Naam: " + naam);
-                System.out.println("Rol: " + rol);
-                if (epicTitel != null || userStoryTitel != null || taakTitel != null) {
-                    if (epicTitel != null) {
-                        System.out.println("Epic titel: " + epicTitel);
-                        System.out.println("Epic beschrijving: " + epicBeschrijving);
-                    }
-                    if (userStoryTitel != null) {
-                        System.out.println("User Story titel: " + userStoryTitel);
-                        System.out.println("User Story beschrijving: " + userStoryBeschrijving);
-                    }
-                    if (taakTitel != null) {
-                        System.out.println("Taak titel: " + taakTitel);
-                        System.out.println("Taak beschrijving: " + taakBeschrijving);
-                    }
-                }
-                System.out.println("Tekst: " + tekst);
-                System.out.println("Datum: " + datum);
-                System.out.println("------------------------------------");
-            }
         } catch (SQLException e) {
             System.err.println("Fout bij het ophalen van berichten: " + e.getMessage());
+        }
+    }
+
+    // Voor queries met twee parameters
+    private void displayMessages(String query, int id1, int id2) {
+        try (Connection connection = Account.connect();
+             PreparedStatement stmt = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
+
+            stmt.setInt(1, id1);
+            stmt.setInt(2, id2);
+
+            processMessageResultSet(stmt.executeQuery(), id1);
+
+        } catch (SQLException e) {
+            System.err.println("Fout bij het ophalen van berichten: " + e.getMessage());
+        }
+    }
+
+    // Gescheiden logica voor resultaatverwerking
+    private void processMessageResultSet(ResultSet rs, int id) throws SQLException {
+        if (!rs.next()) {
+            System.out.println("Geen berichten gevonden voor ID: " + id);
+            return;
+        }
+
+        rs.beforeFirst();
+
+        while (rs.next()) {
+            String naam = rs.getString("Naam");
+            String rol = rs.getString("Rol");
+            String epicTitel = rs.getString("EpicTitel");
+            String epicBeschrijving = rs.getString("EpicBeschrijving");
+            String userStoryTitel = rs.getString("UserStoryTitel");
+            String userStoryBeschrijving = rs.getString("UserStoryBeschrijving");
+            String taakTitel = rs.getString("TaakTitel");
+            String taakBeschrijving = rs.getString("TaakBeschrijving");
+            String tekst = rs.getString("Tekst");
+            int BerichtID = rs.getInt("berichtID");
+            Date datum = rs.getDate("Datum");
+
+            System.out.println("Naam: " + naam);
+            System.out.println("Rol: " + rol);
+            if (epicTitel != null || userStoryTitel != null || taakTitel != null) {
+                if (epicTitel != null) {
+                    System.out.println("Epic titel: " + epicTitel);
+                    System.out.println("Epic beschrijving: " + epicBeschrijving);
+                }
+                if (userStoryTitel != null) {
+                    System.out.println("User Story titel: " + userStoryTitel);
+                    System.out.println("User Story beschrijving: " + userStoryBeschrijving);
+                }
+                if (taakTitel != null) {
+                    System.out.println("Taak titel: " + taakTitel);
+                    System.out.println("Taak beschrijving: " + taakBeschrijving);
+                }
+            }
+            System.out.println("Tekst: " + tekst);
+            System.out.println("BerichtID: " + BerichtID);
+            System.out.println("Datum: " + datum);
+            System.out.println("------------------------------------");
         }
     }
 
@@ -117,7 +140,7 @@ public class MessageService {
 
     public void displayMessagesForSprint(int sprintID) {
         String query = "SELECT b.Tekst, b.Datum, g.Naam, g.Rol, e.Titel AS EpicTitel, e.Beschrijving AS EpicBeschrijving, " +
-                "us.Titel AS UserStoryTitel, us.Beschrijving AS UserStoryBeschrijving, t.Titel AS TaakTitel, t.Beschrijving AS TaakBeschrijving " +
+                "us.Titel AS UserStoryTitel, us.Beschrijving AS UserStoryBeschrijving, t.Titel AS TaakTitel, t.Beschrijving AS TaakBeschrijving, b.BerichtID " +
                 "FROM Bericht b " +
                 "JOIN Gebruiker g ON b.AfzenderID = g.GebruikerID " +
                 "LEFT JOIN Epics e ON b.Epic_ID = e.EpicID " +
@@ -129,17 +152,21 @@ public class MessageService {
     }
 
 
-    // Methode om berichten weer te geven in een specifieke thread
+    // Methode om berichten weer te geven in een specifieke thread en sorteren als er een juist antwoord is
     public void displayMessagesInThread(int threadID) {
-        String query = "SELECT b.Tekst, b.Datum, g.Naam, g.Rol, e.Titel AS EpicTitel, e.Beschrijving AS EpicBeschrijving, " +
-                "us.Titel AS UserStoryTitel, us.Beschrijving AS UserStoryBeschrijving, t.Titel AS TaakTitel, t.Beschrijving AS TaakBeschrijving " +
-                "FROM Bericht b " +
-                "JOIN Gebruiker g ON b.AfzenderID = g.GebruikerID " +
-                "LEFT JOIN Epics e ON b.Epic_ID = e.EpicID " +
-                "LEFT JOIN UserStories us ON b.UserStory_ID = us.UserStoryID " +
-                "LEFT JOIN Taken t ON b.Taak_ID = t.TaakID " +
-                "WHERE b.Thread_ID = ?";
-        displayMessages(query, threadID);
+        String query =
+                "SELECT b.Tekst, b.Datum, g.Naam, g.Rol, " +
+                        "e.Titel AS EpicTitel, e.Beschrijving AS EpicBeschrijving, " +
+                        "us.Titel AS UserStoryTitel, us.Beschrijving AS UserStoryBeschrijving, " +
+                        "t.Titel AS TaakTitel, t.Beschrijving AS TaakBeschrijving, b.BerichtID " +
+                        "FROM Bericht b " +
+                        "JOIN Gebruiker g ON b.AfzenderID = g.GebruikerID " +
+                        "LEFT JOIN Epics e ON b.Epic_ID = e.EpicID " +
+                        "LEFT JOIN UserStories us ON b.UserStory_ID = us.UserStoryID " +
+                        "LEFT JOIN Taken t ON b.Taak_ID = t.TaakID " +
+                        "WHERE b.Thread_ID = ? " +
+                        "ORDER BY (b.BerichtID = (SELECT Juiste_Antwoord FROM Thread WHERE ThreadID = ?)) DESC, b.Datum DESC";
+        displayMessages(query, threadID, threadID);
     }
 
 

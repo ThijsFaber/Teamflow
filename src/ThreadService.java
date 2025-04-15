@@ -5,9 +5,9 @@ import java.util.List;
 
 public class ThreadService {
 
-    // Methode om een nieuwe thread aan te maken in de database
-    public void createThread(String titel, int sprintID, int epicID, int userStoryID, int taakID) throws SQLException {
-        String sql = "INSERT INTO Thread (Status, Titel, Datum, Sprint_ID, Epic_ID, UserStory_ID, Taak_ID) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    // Methode om een thread aan te maken
+    public void createThread(String titel, int sprintID, int epicID, int userStoryID, int taakID, int gebruikerID) throws SQLException {
+        String sql = "INSERT INTO Thread (Status, Titel, Datum, Sprint_ID, Epic_ID, UserStory_ID, Taak_ID, Maker) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         // Connectie opzetten en query klaarzetten
         try (Connection conn = Account.connect(); PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -21,16 +21,18 @@ public class ThreadService {
             if (userStoryID > 0) stmt.setInt(6, userStoryID); else stmt.setNull(6, java.sql.Types.INTEGER);
             if (taakID > 0) stmt.setInt(7, taakID); else stmt.setNull(7, java.sql.Types.INTEGER);
 
+            // Voeg de maker toe
+            stmt.setInt(8, gebruikerID); // koppel de maker (gebruikerID)
+
             stmt.executeUpdate(); // uitvoeren die handel
             System.out.println("Thread succesvol aangemaakt."); // even een check
         }
     }
 
-    // Methode om alle threads op te halen die bij een bepaalde sprint horen
+    // Methode om alle threads op te halen die bij een bepaalde sprint horen, inclusief de maker
     public List<Thread> getThreadsBySprint(int sprintID) throws SQLException {
         List<Thread> threads = new ArrayList<>();
         String query = "SELECT * FROM Thread WHERE Sprint_ID = ?";
-
 
         try (Connection conn = Account.connect(); PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setInt(1, sprintID); // ophalen op basis van sprint ID
@@ -45,10 +47,13 @@ public class ThreadService {
                 int epicID = rs.getInt("Epic_ID");
                 int userStoryID = rs.getInt("UserStory_ID");
                 int taakID = rs.getInt("Taak_ID");
+                int maker = rs.getInt("Maker"); // Ophalen van MakerID
 
-                threads.add(new Thread(id, titel, datum, status, epicID, userStoryID, taakID)); // even alles in het object zetten
+                // Voeg de maker toe aan het Thread-object
+                threads.add(new Thread(id, titel, datum, status, epicID, userStoryID, taakID, maker)); // Toevoegen van makerID
             }
         }
         return threads; // klaar, lijst teruggeven
     }
+
 }
