@@ -10,7 +10,7 @@ public class MessageService {
 
             stmt.setInt(1, id);
 
-            processMessageResultSet(stmt.executeQuery(), id);
+            processMessageResultSet(stmt.executeQuery(), id, -1);
 
         } catch (SQLException e) {
             System.err.println("Fout bij het ophalen van berichten: " + e.getMessage());
@@ -18,14 +18,14 @@ public class MessageService {
     }
 
     // Voor queries met twee parameters
-    private void displayMessages(String query, int id1, int id2) {
+    private void displayMessages(String query, int id1, int id2, int juisteAntwoordID) {
         try (Connection connection = Account.connect();
              PreparedStatement stmt = connection.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
 
             stmt.setInt(1, id1);
             stmt.setInt(2, id2);
 
-            processMessageResultSet(stmt.executeQuery(), id1);
+            processMessageResultSet(stmt.executeQuery(), id1, juisteAntwoordID);
 
         } catch (SQLException e) {
             System.err.println("Fout bij het ophalen van berichten: " + e.getMessage());
@@ -33,7 +33,7 @@ public class MessageService {
     }
 
     // Gescheiden logica voor resultaatverwerking
-    private void processMessageResultSet(ResultSet rs, int id) throws SQLException {
+    private void processMessageResultSet(ResultSet rs, int id, int juisteAntwoordID) throws SQLException {
         if (!rs.next()) {
             System.out.println("Geen berichten gevonden voor ID: " + id);
             return;
@@ -42,6 +42,14 @@ public class MessageService {
         rs.beforeFirst();
 
         while (rs.next()) {
+
+            int berichtID = rs.getInt("berichtID");
+            boolean isJuisteAntwoord = berichtID == juisteAntwoordID;
+
+            if (isJuisteAntwoord) {
+                System.out.println("\n********** [JUISTE ANTWOORD] **********");
+            }
+
             String naam = rs.getString("Naam");
             String rol = rs.getString("Rol");
             String epicTitel = rs.getString("EpicTitel");
@@ -73,7 +81,11 @@ public class MessageService {
             System.out.println("Tekst: " + tekst);
             System.out.println("BerichtID: " + BerichtID);
             System.out.println("Datum: " + datum);
-            System.out.println("------------------------------------");
+            if (isJuisteAntwoord) {
+                System.out.println("********** EINDE JUISTE ANTWOORD **********\n");
+            } else {
+                System.out.println("------------------------------------");
+            }
         }
     }
 
@@ -154,6 +166,21 @@ public class MessageService {
 
     // Methode om berichten weer te geven in een specifieke thread en sorteren als er een juist antwoord is
     public void displayMessagesInThread(int threadID) {
+        String juisteAntwoordQuery = "SELECT Juiste_Antwoord FROM Thread WHERE ThreadID = ?";
+        int juisteAntwoordID = -1;
+
+        try (Connection conn = Account.connect();
+             PreparedStatement stmt = conn.prepareStatement(juisteAntwoordQuery)) {
+            stmt.setInt(1, threadID);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                juisteAntwoordID = rs.getInt("Juiste_Antwoord");
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+
         String query =
                 "SELECT b.Tekst, b.Datum, g.Naam, g.Rol, " +
                         "e.Titel AS EpicTitel, e.Beschrijving AS EpicBeschrijving, " +
@@ -166,7 +193,7 @@ public class MessageService {
                         "LEFT JOIN Taken t ON b.Taak_ID = t.TaakID " +
                         "WHERE b.Thread_ID = ? " +
                         "ORDER BY (b.BerichtID = (SELECT Juiste_Antwoord FROM Thread WHERE ThreadID = ?)) DESC, b.Datum DESC";
-        displayMessages(query, threadID, threadID);
+        displayMessages(query, threadID, threadID, juisteAntwoordID);
     }
 
 

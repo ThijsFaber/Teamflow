@@ -92,13 +92,11 @@ public class Main {
                     break;
 
                 case "2":
-                    // threads bekijken in deze sprint
                     try {
                         List<Thread> threads = threadService.getThreadsBySprint(sprint.getSprintID());
                         if (threads.isEmpty()) {
                             System.out.println("Geen threads gevonden in deze sprint.");
                         } else {
-                            // threads printen
                             System.out.println("\nThreads in deze sprint:");
                             for (Thread thread : threads) {
                                 System.out.println(thread);
@@ -115,33 +113,25 @@ public class Main {
                                 }
                             }
 
-                            if (chosenThreadID > 0) {
-                                messageService.displayMessagesInThread(chosenThreadID); // laat alle berichten in thread zien
+                            if (chosenThreadID > 0 && gekozenThread != null) {
+                                messageService.displayMessagesInThread(chosenThreadID);
 
                                 boolean inThreadMenu = true;
                                 while (inThreadMenu) {
                                     System.out.println("\nKies een optie:");
                                     System.out.println("1. Bericht sturen");
-
-                                    // Check if the current user is the scrummaster or the maker of the thread
-                                    if (gekozenThread != null && (gebruiker.getRol().equalsIgnoreCase("scrummaster") || gebruiker.getGebruikerID() == (gekozenThread).getMakerID())) {
-                                        System.out.println("2. Juiste antwoord kiezen (nog niet beschikbaar)");
+                                    if (gebruiker.getRol().equalsIgnoreCase("scrummaster") || gebruiker.getGebruikerID() == gekozenThread.getMakerID()) {
+                                        System.out.println("2. Juiste antwoord kiezen");
                                         System.out.println("3. Thread sluiten (nog niet beschikbaar)");
                                     }
-
                                     System.out.println("0. Terug");
 
                                     String keuze = scanner.nextLine();
-
                                     switch (keuze) {
                                         case "1":
                                             System.out.print("Typ je bericht: ");
                                             tekst = scanner.nextLine();
-
-                                            // koppeling resetten
-                                            epicID = 0;
-                                            userStoryID = 0;
-                                            taakID = 0;
+                                            epicID = userStoryID = taakID = 0;
 
                                             System.out.print("Koppel een Epic, UserStory of Taak? (Epic/UserStory/Taak/Nee): ");
                                             String koppeling = scanner.nextLine();
@@ -157,19 +147,26 @@ public class Main {
                                                 taakID = Integer.parseInt(scanner.nextLine());
                                             }
 
-                                            messageService.sendMessageToThread(gebruiker.getGebruikerID(), chosenThreadID, tekst, epicID, userStoryID, taakID);
+                                            messageService.sendMessageToThread(gebruiker.getGebruikerID(), gekozenThread.getID(), tekst, epicID, userStoryID, taakID);
                                             break;
 
                                         case "2":
-                                            if (gekozenThread != null && (gebruiker.getRol().equalsIgnoreCase("scrummaster") || gebruiker.getGebruikerID() == gekozenThread.getMakerID())) {
-                                                System.out.println("Functie 'juiste antwoord kiezen' is nog niet beschikbaar.");
+                                            if (gebruiker.getRol().equalsIgnoreCase("scrummaster") || gebruiker.getGebruikerID() == gekozenThread.getMakerID()) {
+                                                System.out.print("Vul BerichtID van het juiste antwoord in: ");
+                                                int berichtID = Integer.parseInt(scanner.nextLine());
+                                                try {
+                                                    threadService.setJuisteAntwoord(gekozenThread.getID(), berichtID);
+                                                    System.out.println("Juiste antwoord ingesteld!");
+                                                } catch (SQLException e) {
+                                                    System.err.println("Fout bij instellen van juiste antwoord: " + e.getMessage());
+                                                }
+                                            } else {
+                                                System.out.println("Geen toestemming om dit te doen.");
                                             }
                                             break;
 
                                         case "3":
-                                            if (gekozenThread != null && (gebruiker.getRol().equalsIgnoreCase("scrummaster") || gebruiker.getGebruikerID() == gekozenThread.getMakerID())) {
-                                                System.out.println("Functie 'thread sluiten' is nog niet beschikbaar.");
-                                            }
+                                            System.out.println("Functie 'thread sluiten' is nog niet beschikbaar.");
                                             break;
 
                                         case "0":
@@ -177,17 +174,16 @@ public class Main {
                                             break;
 
                                         default:
-                                            System.out.println("Ongeldige keuze, probeer opnieuw.");
+                                            System.out.println("Ongeldige keuze.");
                                     }
                                 }
-
                             }
-
                         }
                     } catch (SQLException e) {
-                        System.err.println("Fout bij het ophalen van threads: " + e.getMessage());
+                        System.err.println("Fout bij ophalen van threads: " + e.getMessage());
                     }
                     break;
+
 
                 case "3":
                     // nieuwe thread maken
@@ -226,7 +222,7 @@ public class Main {
                 default:
                     System.out.println("Ongeldige keuze. Probeer opnieuw.");
             }
-        }
+            }
     }
     public static void alleSprintsTonen() throws SQLException {
         System.out.println("Alle sprints tonen:");

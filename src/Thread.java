@@ -9,9 +9,11 @@ public class Thread {
     private int userStoryID;
     private int taakID;
     private int makerID; // New field for the maker
+    private int juiste_antwoord;
+
 
     // Constructor with makerID
-    public Thread(int id, String titel, Date datum, boolean status, int epicID, int userStoryID, int taakID, int makerID) {
+    public Thread(int id, String titel, Date datum, boolean status, int epicID, int userStoryID, int taakID, int makerID, int juiste_antwoord) {
         this.id = id;
         this.titel = titel;
         this.datum = datum;
@@ -20,6 +22,7 @@ public class Thread {
         this.userStoryID = userStoryID;
         this.taakID = taakID;
         this.makerID = makerID; // Set the maker ID
+        this.juiste_antwoord = juiste_antwoord;
     }
 
     // Getter for makerID
@@ -27,7 +30,9 @@ public class Thread {
         return makerID;
     }
 
-
+    public int getJuiste_antwoord() {
+        return juiste_antwoord;
+    }
 
     // formatting van threads dus als (thread) word aangeroepen komt het er zo uit
     public String toString() {

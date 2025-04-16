@@ -48,12 +48,23 @@ public class ThreadService {
                 int userStoryID = rs.getInt("UserStory_ID");
                 int taakID = rs.getInt("Taak_ID");
                 int maker = rs.getInt("Maker"); // Ophalen van MakerID
+                int juist_antwoord = rs.getInt("Juiste_Antwoord");
 
                 // Voeg de maker toe aan het Thread-object
-                threads.add(new Thread(id, titel, datum, status, epicID, userStoryID, taakID, maker)); // Toevoegen van makerID
+                threads.add(new Thread(id, titel, datum, status, epicID, userStoryID, taakID, maker, juist_antwoord)); // Toevoegen van makerID
             }
         }
         return threads; // klaar, lijst teruggeven
+    }
+
+    public void setJuisteAntwoord(int threadID, int berichtID) throws SQLException {
+        String query = "UPDATE Thread SET Juiste_Antwoord = ? WHERE ThreadID = ?";
+
+        try (Connection conn = Account.connect(); PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, berichtID);
+            stmt.setInt(2, threadID);
+            stmt.executeUpdate();
+        }
     }
 
 }
