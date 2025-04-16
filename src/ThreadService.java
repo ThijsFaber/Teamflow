@@ -67,4 +67,27 @@ public class ThreadService {
         }
     }
 
+    public void sluitThread(int threadID) throws SQLException {
+        String query = "UPDATE thread SET status = 0 WHERE ThreadID = ?";
+
+        try (Connection conn = Account.connect();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, threadID);
+            stmt.executeUpdate();
+        }
+    }
+
+    public boolean isThreadGesloten(int threadID) throws SQLException {
+        String query = "SELECT status FROM thread WHERE ThreadID = ?";
+        try (Connection conn = Account.connect();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, threadID);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("status") == 0;
+            }
+        }
+        return false;
+    }
+
 }

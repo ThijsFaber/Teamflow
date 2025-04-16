@@ -115,6 +115,11 @@ public class Main {
 
                             if (chosenThreadID > 0 && gekozenThread != null) {
                                 messageService.displayMessagesInThread(chosenThreadID);
+                                if (threadService.isThreadGesloten(gekozenThread.getID())) {
+                                    System.out.println("Deze thread is gesloten. Je kunt geen berichten meer sturen.");
+                                    break;
+                                }
+
 
                                 boolean inThreadMenu = true;
                                 while (inThreadMenu) {
@@ -122,7 +127,7 @@ public class Main {
                                     System.out.println("1. Bericht sturen");
                                     if (gebruiker.getRol().equalsIgnoreCase("scrummaster") || gebruiker.getGebruikerID() == gekozenThread.getMakerID()) {
                                         System.out.println("2. Juiste antwoord kiezen");
-                                        System.out.println("3. Thread sluiten (nog niet beschikbaar)");
+                                        System.out.println("3. Thread sluiten");
                                     }
                                     System.out.println("0. Terug");
 
@@ -166,7 +171,17 @@ public class Main {
                                             break;
 
                                         case "3":
-                                            System.out.println("Functie 'thread sluiten' is nog niet beschikbaar.");
+                                            if (gebruiker.getRol().equalsIgnoreCase("scrummaster") || gebruiker.getGebruikerID() == gekozenThread.getMakerID()) {
+                                                try {
+                                                    threadService.sluitThread(gekozenThread.getID());
+                                                    System.out.println("Thread succesvol gesloten.");
+                                                } catch (SQLException e) {
+                                                    System.err.println("Fout bij sluiten van thread: " + e.getMessage());
+                                                }
+                                                inThreadMenu = false;
+                                            } else {
+                                                System.out.println("Je hebt geen rechten om deze thread te sluiten.");
+                                            }
                                             break;
 
                                         case "0":
