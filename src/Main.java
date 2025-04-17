@@ -1,7 +1,6 @@
 // alle imports die we nodig hebben voor SQL stuff en input van gebruiker
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Scanner;
 import java.sql.Date;
 import java.time.LocalDate;
@@ -59,6 +58,7 @@ public class Main {
             System.out.println("1. Bericht sturen");
             System.out.println("2. Thread checken");
             System.out.println("3. Thread aanmaken");
+            System.out.println("4. Zoeken");
             System.out.println("0. Terug");
 
             String choice = scanner.nextLine();
@@ -184,6 +184,7 @@ public class Main {
                                             }
                                             break;
 
+
                                         case "0":
                                             inThreadMenu = false;
                                             break;
@@ -229,6 +230,31 @@ public class Main {
                         System.err.println("Fout bij het aanmaken van de thread: " + e.getMessage());
                     }
                     break;
+
+                case "4":
+
+                        System.out.println("1. Zoeken op bericht");
+                        System.out.println("2. Zoeken op titel");
+                        String keuzeZoeker = scanner.nextLine();
+                        switch (keuzeZoeker) {
+                            case "1":
+                                System.out.println("Geef zoekterm");
+                                String zoekInhoud = scanner.nextLine();
+                                messageService.searchMessageContent(gebruiker.getGebruikerID(), zoekInhoud, sprint.getSprintID());
+                                break;
+
+                            case "2":
+                                System.out.println("Geef zoekterm");
+                                String zoekTitel = scanner.nextLine();
+                                messageService.searchMessageTitel(gebruiker.getGebruikerID(), zoekTitel, sprint.getSprintID());
+                                break;
+
+                            case "0":
+                                break;
+
+                            default:
+                                System.out.println("Ongeldige keuze. Probeer opnieuw.");
+                        }
 
                 case "0":
                     // terug naar vorige menu

@@ -226,4 +226,44 @@ public class MessageService {
             System.out.println("Bericht succesvol geplaatst in thread " + threadID);
         }
     }
+
+    public void searchMessageContent(int gebruikerID, String zoek, int SprintID){
+
+        String sprintsSelecten =
+                "SELECT b.Tekst, b.Datum, g.Naam, g.Rol, e.Titel AS EpicTitel, e.Beschrijving AS EpicBeschrijving, " +
+                        "us.Titel AS UserStoryTitel, us.Beschrijving AS UserStoryBeschrijving, t.Titel AS TaakTitel, t.Beschrijving AS TaakBeschrijving, b.BerichtID " +
+                        "FROM Bericht b " +
+                        "JOIN Gebruiker g ON b.AfzenderID = g.GebruikerID " +
+                        "LEFT JOIN Epics e ON b.Epic_ID = e.EpicID " +
+                        "LEFT JOIN UserStories us ON b.UserStory_ID = us.UserStoryID " +
+                        "LEFT JOIN Taken t ON b.Taak_ID = t.TaakID " +
+                        "JOIN Sprint_Bericht_Verbinding sbv ON b.BerichtID = sbv.BerichtID " +
+                        "JOIN sprint_teamleden spt ON sbv.SprintID = spt.SprintID " +
+                        "WHERE sbv.SprintID = ?" +
+                        " AND spt.GebruikerID =  " + gebruikerID +
+                        " AND b.Tekst LIKE \"%" + zoek + "%\"";
+
+        displayMessages(sprintsSelecten, SprintID);
+
+    }
+
+    public void searchMessageTitel(int gebruikerID, String zoek, int SprintID){
+        String sprintsSelecten =
+                "SELECT b.Tekst, b.Datum, g.Naam, g.Rol, e.Titel AS EpicTitel, e.Beschrijving AS EpicBeschrijving, " +
+                        "us.Titel AS UserStoryTitel, us.Beschrijving AS UserStoryBeschrijving, t.Titel AS TaakTitel, t.Beschrijving AS TaakBeschrijving, b.BerichtID " +
+                        "FROM Bericht b " +
+                        "JOIN Gebruiker g ON b.AfzenderID = g.GebruikerID " +
+                        "LEFT JOIN Epics e ON b.Epic_ID = e.EpicID " +
+                        "LEFT JOIN UserStories us ON b.UserStory_ID = us.UserStoryID " +
+                        "LEFT JOIN Taken t ON b.Taak_ID = t.TaakID " +
+                        "JOIN Sprint_Bericht_Verbinding sbv ON b.BerichtID = sbv.BerichtID " +
+                        "JOIN sprint_teamleden spt ON sbv.SprintID = spt.SprintID " +
+                        "WHERE sbv.SprintID = ?" +
+                        " AND spt.GebruikerID =  " + gebruikerID +
+                        " AND (us.titel LIKE \"%" + zoek + "%\" " +
+                        "OR t.Titel LIKE \"%" + zoek + "%\" " +
+                        "OR e.Titel LIKE \"%" + zoek + "%\")";
+
+        displayMessages(sprintsSelecten, SprintID);
+    }
 }
