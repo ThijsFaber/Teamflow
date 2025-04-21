@@ -10,7 +10,7 @@ public class Main {
     // deze methode laat je actieve sprints zien en daarna kan je berichten bekijken/sturen
     private static void viewActiveSprints(SprintService sprintService, MessageService messageService, Gebruiker gebruiker, Scanner scanner) throws SQLException {
         List<Sprint> activeSprints;
-        //voor scrummasters alle sprints laten zien en voor gebruikers alleen met toegang
+
         if (gebruiker.getRol().equalsIgnoreCase("scrummaster")) {
             activeSprints = sprintService.getActiveSprints();
         } else {
@@ -18,35 +18,45 @@ public class Main {
         }
 
         if (activeSprints.isEmpty()) {
-            System.out.println("Er zijn momenteel geen actieve sprints."); // lege sprints
+            System.out.println("Er zijn momenteel geen actieve sprints.");
             return;
         }
 
         System.out.println("Actieve sprints:");
         for (Sprint sprint : activeSprints) {
-            // print id, naam en hoeveel dagen nog over
             System.out.println(sprint.getSprintID() + ". " + sprint.getNaam() + " - " + sprint.getDaysLeft() + " dagen te gaan");
         }
 
-        System.out.print("Kies een sprint (voer SprintID in): ");
-        int sprintID = Integer.parseInt(scanner.nextLine());
-
         Sprint selectedSprint = null;
-        for (Sprint sprint : activeSprints) {
-            if (sprint.getSprintID() == sprintID) {
-                selectedSprint = sprint;
-                break;
+        while (selectedSprint == null) {
+            System.out.print("Kies een sprint (voer SprintID in): ");
+            String input = scanner.nextLine();
+
+            int sprintID;
+            try {
+                sprintID = Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Ongeldige invoer. Voer een geldig nummer in.");
+                continue;
+            }
+
+            for (Sprint sprint : activeSprints) {
+                if (sprint.getSprintID() == sprintID) {
+                    selectedSprint = sprint;
+                    break;
+                }
+            }
+
+            if (selectedSprint == null) {
+                System.out.println("SprintID niet gevonden. Probeer opnieuw.");
             }
         }
 
-        if (selectedSprint != null) {
-            System.out.println("Je hebt de sprint '" + selectedSprint.getNaam() + "' gekozen.");
-            messageService.displayMessagesForSprint(sprintID);  // hier laat je alle berichten zien die bij deze sprint horen
-            sendMessageInSprint(selectedSprint, gebruiker, messageService, scanner); // doorsturen naar volgende class
-        } else {
-            System.out.println("Ongeldige SprintID. Probeer opnieuw.");
-        }
+        System.out.println("Je hebt de sprint '" + selectedSprint.getNaam() + "' gekozen.");
+        messageService.displayMessagesForSprint(selectedSprint.getSprintID());
+        sendMessageInSprint(selectedSprint, gebruiker, messageService, scanner);
     }
+
 
     // alles wat je binnen een sprint kan doen (berichten, threads)
     private static void sendMessageInSprint(Sprint sprint, Gebruiker gebruiker, MessageService messageService, Scanner scanner) {
@@ -233,28 +243,28 @@ public class Main {
 
                 case "4":
 
-                        System.out.println("1. Zoeken op bericht");
-                        System.out.println("2. Zoeken op titel");
-                        String keuzeZoeker = scanner.nextLine();
-                        switch (keuzeZoeker) {
-                            case "1":
-                                System.out.println("Geef zoekterm");
-                                String zoekInhoud = scanner.nextLine();
-                                messageService.searchMessageContent(gebruiker.getGebruikerID(), zoekInhoud, sprint.getSprintID());
-                                break;
+                    System.out.println("1. Zoeken op bericht");
+                    System.out.println("2. Zoeken op titel");
+                    String keuzeZoeker = scanner.nextLine();
+                    switch (keuzeZoeker) {
+                        case "1":
+                            System.out.println("Geef zoekterm");
+                            String zoekInhoud = scanner.nextLine();
+                            messageService.searchMessageContent(zoekInhoud, sprint.getSprintID(), gebruiker);
+                            break;
 
-                            case "2":
-                                System.out.println("Geef zoekterm");
-                                String zoekTitel = scanner.nextLine();
-                                messageService.searchMessageTitel(gebruiker.getGebruikerID(), zoekTitel, sprint.getSprintID());
-                                break;
+                        case "2":
+                            System.out.println("Geef zoekterm");
+                            String zoekTitel = scanner.nextLine();
+                            messageService.searchMessageTitel(gebruiker, zoekTitel, sprint.getSprintID());
+                            break;
 
-                            case "0":
-                                break;
+                        case "0":
+                            break;
 
-                            default:
-                                System.out.println("Ongeldige keuze. Probeer opnieuw.");
-                        }
+                        default:
+                            System.out.println("Ongeldige keuze. Probeer opnieuw.");
+                    }
 
                 case "0":
                     // terug naar vorige menu
@@ -263,7 +273,7 @@ public class Main {
                 default:
                     System.out.println("Ongeldige keuze. Probeer opnieuw.");
             }
-            }
+        }
     }
     public static void alleSprintsTonen() throws SQLException {
         System.out.println("Alle sprints tonen:");

@@ -227,7 +227,18 @@ public class MessageService {
         }
     }
 
-    public void searchMessageContent(int gebruikerID, String zoek, int SprintID){
+    public void searchMessageContent(String zoek, int SprintID, Gebruiker gebruiker){
+
+        boolean isScrumMaster = gebruiker.getRol().equalsIgnoreCase("scrummaster");
+
+        // true : false
+        String joins =
+                "JOIN Sprint_Bericht_Verbinding sbv ON b.BerichtID = sbv.BerichtID " +
+                        (isScrumMaster ? "" : "JOIN sprint_teamleden spt ON sbv.SprintID = spt.SprintID ");
+        String whereClause =
+                "WHERE sbv.SprintID = ?" +
+                        (isScrumMaster ? "" : " AND spt.GebruikerID = " + gebruiker.getGebruikerID()) +
+                        " AND b.Tekst LIKE \"%" + zoek + "%\"";
 
         String sprintsSelecten =
                 "SELECT b.Tekst, b.Datum, g.Naam, g.Rol, e.Titel AS EpicTitel, e.Beschrijving AS EpicBeschrijving, " +
@@ -237,33 +248,41 @@ public class MessageService {
                         "LEFT JOIN Epics e ON b.Epic_ID = e.EpicID " +
                         "LEFT JOIN UserStories us ON b.UserStory_ID = us.UserStoryID " +
                         "LEFT JOIN Taken t ON b.Taak_ID = t.TaakID " +
-                        "JOIN Sprint_Bericht_Verbinding sbv ON b.BerichtID = sbv.BerichtID " +
-                        "JOIN sprint_teamleden spt ON sbv.SprintID = spt.SprintID " +
-                        "WHERE sbv.SprintID = ?" +
-                        " AND spt.GebruikerID =  " + gebruikerID +
-                        " AND b.Tekst LIKE \"%" + zoek + "%\"";
+                        joins +
+                        whereClause;
+
 
         displayMessages(sprintsSelecten, SprintID);
 
     }
 
-    public void searchMessageTitel(int gebruikerID, String zoek, int SprintID){
-        String sprintsSelecten =
-                "SELECT b.Tekst, b.Datum, g.Naam, g.Rol, e.Titel AS EpicTitel, e.Beschrijving AS EpicBeschrijving, " +
-                        "us.Titel AS UserStoryTitel, us.Beschrijving AS UserStoryBeschrijving, t.Titel AS TaakTitel, t.Beschrijving AS TaakBeschrijving, b.BerichtID " +
-                        "FROM Bericht b " +
-                        "JOIN Gebruiker g ON b.AfzenderID = g.GebruikerID " +
-                        "LEFT JOIN Epics e ON b.Epic_ID = e.EpicID " +
-                        "LEFT JOIN UserStories us ON b.UserStory_ID = us.UserStoryID " +
-                        "LEFT JOIN Taken t ON b.Taak_ID = t.TaakID " +
-                        "JOIN Sprint_Bericht_Verbinding sbv ON b.BerichtID = sbv.BerichtID " +
-                        "JOIN sprint_teamleden spt ON sbv.SprintID = spt.SprintID " +
-                        "WHERE sbv.SprintID = ?" +
-                        " AND spt.GebruikerID =  " + gebruikerID +
-                        " AND (us.titel LIKE \"%" + zoek + "%\" " +
-                        "OR t.Titel LIKE \"%" + zoek + "%\" " +
-                        "OR e.Titel LIKE \"%" + zoek + "%\")";
+    public void searchMessageTitel(Gebruiker gebruiker, String zoek, int SprintID){
+            boolean isScrumMaster = gebruiker.getRol().equalsIgnoreCase("scrummaster");
 
-        displayMessages(sprintsSelecten, SprintID);
+
+            String joins =
+                    "JOIN Sprint_Bericht_Verbinding sbv ON b.BerichtID = sbv.BerichtID " +
+                            (isScrumMaster ? "" : "JOIN sprint_teamleden spt ON sbv.SprintID = spt.SprintID ");
+
+
+            String whereClause =
+                    "WHERE sbv.SprintID = ?" +
+                            (isScrumMaster ? "" : " AND spt.GebruikerID = " + gebruiker.getGebruikerID()) +
+                            " AND (us.Titel LIKE \"%" + zoek + "%\" " +
+                            "OR t.Titel LIKE \"%" + zoek + "%\" " +
+                            "OR e.Titel LIKE \"%" + zoek + "%\")";
+
+            String sprintsSelecten =
+                    "SELECT b.Tekst, b.Datum, g.Naam, g.Rol, e.Titel AS EpicTitel, e.Beschrijving AS EpicBeschrijving, " +
+                            "us.Titel AS UserStoryTitel, us.Beschrijving AS UserStoryBeschrijving, t.Titel AS TaakTitel, t.Beschrijving AS TaakBeschrijving, b.BerichtID " +
+                            "FROM Bericht b " +
+                            "JOIN Gebruiker g ON b.AfzenderID = g.GebruikerID " +
+                            "LEFT JOIN Epics e ON b.Epic_ID = e.EpicID " +
+                            "LEFT JOIN UserStories us ON b.UserStory_ID = us.UserStoryID " +
+                            "LEFT JOIN Taken t ON b.Taak_ID = t.TaakID " +
+                            joins +
+                            whereClause;
+
+            displayMessages(sprintsSelecten, SprintID);
     }
 }
