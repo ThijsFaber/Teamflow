@@ -289,8 +289,14 @@ public class Main {
 
         while (true) {
             System.out.println("1. Register\n2. Login\n0. Exit");
-            int choice = Integer.parseInt(scanner.nextLine());
+            int choice = 0;
+            boolean gekozen = false;
+            try {
+                choice = Integer.parseInt(scanner.nextLine());
+                gekozen = true;
+            } catch (NumberFormatException _) {
 
+            }
             try {
                 if (choice == 1) {
                     // registratie
@@ -423,9 +429,11 @@ public class Main {
                     } else {
                         System.out.println("Inlog mislukt.\n");
                     }
-                } else if (choice == 0) {
+                } else if (choice == 0 && gekozen) {
                     System.out.println("Tot ziens!");
                     break;
+                } else {
+                    System.out.println("Ongeldige keuze. Probeer opnieuw.");
                 }
             } catch (SQLException e) {
                 System.err.println("Database fout: " + e.getMessage());
